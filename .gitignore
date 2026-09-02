@@ -1,0 +1,46 @@
+# secrets — must never be tracked
+.env
+.env.*
+*.key
+*.pem
+credentials*
+
+# python / env
+__pycache__/
+*.py[cod]
+build/
+dist/
+*.egg-info/
+.venv/
+
+# large or generated artifacts — pulled or built, not source
+vendor/
+models/
+data/
+profiles/
+*.gguf
+*.safetensors
+
+# generated audio + cached reference-token encodings — regenerable, not source
+*.wav
+*.pt
+
+# experiment output — large, regenerable
+wandb/
+runs/
+
+# scratch / personal — not meant for other eyes
+*.log
+.cache/
+notes/
+scratch/
+
+# docs — planning notes live outside this repo; only README ships here
+*.md
+!README.md
+
+# OS / editor cruft
+.DS_Store
+.idea/
+.vscode/
+.claude/
