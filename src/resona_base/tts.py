@@ -25,6 +25,12 @@ from .voice_profile import VoiceProfile
 
 _BACKBONE_REPO = os.environ.get("RESONA_BACKBONE_PATH", "neuphonic/neutts-air-q4-gguf")
 
+# Reference codes are prepended to the backbone prompt on every synthesize()
+# call, so a long reference clip is a permanent per-sentence cost, not just a
+# slow enroll. NeuTTS-style cloning saturates well under this, so trim.
+_REF_MAX_SECONDS = 12
+_REF_SR = 16000
+
 _tts: NeuTTS | None = None
 
 
@@ -48,6 +54,7 @@ def _get_tts() -> NeuTTS:
 
 def enroll(ref_audio: np.ndarray, ref_text: str) -> VoiceProfile:
     tts = _get_tts()
+    ref_audio = ref_audio[: _REF_MAX_SECONDS * _REF_SR]
     # [T] -> [1, 1, T]: NeuCodec's tensor-input path expects [B, 1, T] and,
     # unlike its path-based load, does not resample — ref_audio must
     # already be mono float32 @ 16kHz (see util.resample for callers).
