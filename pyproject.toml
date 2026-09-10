@@ -1,0 +1,27 @@
+[project]
+name = "resona-base"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "prtmxio", email = "dhimanpritam1579@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "neutts[llama]",
+    "torch==2.8.0",
+    "torchao==0.12.0",
+    "torchaudio==2.8.0",
+    "pyarrow<19",
+    "sounddevice>=0.5.6",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.29,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.uv.workspace]
+members = ["vendor/neutts-air"]
+
+[tool.uv.sources]
+neutts = { workspace = true, editable = true }
