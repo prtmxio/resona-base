@@ -14,6 +14,11 @@ dependencies = [
     "torchaudio==2.8.0",
     "pyarrow<19",
     "sounddevice>=0.5.6",
+    "faster-whisper>=1.2.1",
+    "silero-vad>=6.2.1",
+    "onnxruntime>=1.29.0",
+    "transformers>=4.56.2",
+    "huggingface-hub>=0.36.2",
 ]
 
 [build-system]
