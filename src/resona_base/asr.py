@@ -20,10 +20,12 @@ _asr: WhisperModel | None = None
 def _get_asr() -> WhisperModel:
     global _asr
     if _asr is None:
-        # int8_float16: CTranslate2's int8-quantized GPU path (weights int8,
-        # accumulation fp16) — same "small" checkpoint as CPU, far less VRAM
-        # and faster than running it fp16/fp32.
-        _asr = WhisperModel(_ASR_MODEL, device="cuda", compute_type="int8_float16")
+        # int8: CTranslate2's fully int8 GPU path (weights and accumulation
+        # both int8, vs int8_float16's fp16 accumulation) — a bit faster,
+        # small extra accuracy cost. Worth it since distil-large-v3's full
+        # large-v3 encoder is heavier than small's; this only trims precision
+        # overhead, not the encoder's actual compute.
+        _asr = WhisperModel(_ASR_MODEL, device="cuda", compute_type="int8")
     return _asr
 
 
