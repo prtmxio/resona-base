@@ -83,4 +83,8 @@ def is_turn_complete(audio: np.ndarray, sr: int) -> bool:
     if still_talking:
         return False
 
-    return _smart_turn_prob(audio) >= _SMART_TURN_THRESHOLD
+    # Smart Turn was trained on buffers that end shortly after speech stops.
+    # A caller-provided buffer can carry an arbitrary amount of trailing
+    # silence beyond that, which drags the score down — trim to match.
+    trimmed_end = min(len(audio), int((segments[-1]["end"] + _MIN_TRAILING_SILENCE_S) * _SR))
+    return _smart_turn_prob(audio[:trimmed_end]) >= _SMART_TURN_THRESHOLD
