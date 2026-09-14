@@ -31,5 +31,11 @@ def transcribe(audio: np.ndarray, sr: int) -> str:
     model = _get_asr()
     audio = to_mono_16k(audio, sr)
     language = None if _ASR_LANGUAGE == "auto" else _ASR_LANGUAGE
-    segments, _info = model.transcribe(audio, language=language, vad_filter=True)
+    # condition_on_previous_text=False: distilled decoders (e.g. distil-large-v3)
+    # are prone to repetition/hallucination when primed with prior-segment text;
+    # our clips are short standalone turns, so cross-segment conditioning buys
+    # nothing anyway.
+    segments, _info = model.transcribe(
+        audio, language=language, vad_filter=True, condition_on_previous_text=False
+    )
     return " ".join(segment.text.strip() for segment in segments).strip()
