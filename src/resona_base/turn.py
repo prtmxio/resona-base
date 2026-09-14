@@ -63,9 +63,11 @@ def _smart_turn_prob(audio: np.ndarray) -> float:
         truncation=True,
         do_normalize=True,
     )
-    (logits,) = session.run(None, {"input_features": inputs["input_features"]})
-    logit = float(logits.reshape(-1)[0])  # (1, 1) -> scalar
-    return 1 / (1 + np.exp(-logit))
+    (output,) = session.run(None, {"input_features": inputs["input_features"]})
+    # The exported graph already ends in a Sigmoid — this is a probability,
+    # not a logit. Applying sigmoid() again would bound it to [0.5, 1), making
+    # a "False" verdict impossible regardless of the audio.
+    return float(output.reshape(-1)[0])  # (1, 1) -> scalar
 
 
 def is_turn_complete(audio: np.ndarray, sr: int) -> bool:
