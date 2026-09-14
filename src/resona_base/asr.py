@@ -7,6 +7,13 @@ from .util import to_mono_16k
 
 _ASR_MODEL = os.environ.get("RESONA_ASR_PATH", "small")
 
+# "small" is multilingual and auto-detects language per call, but a 4-5s clip
+# with quiet leading/trailing audio gives it too little signal — it'll pin the
+# wrong language outright rather than mis-transcribe within the right one.
+# Pinned to English for now; M6's Hinglish work will need this adjustable
+# again (set RESONA_ASR_LANGUAGE=auto to fall back to detection, or e.g. "hi").
+_ASR_LANGUAGE = os.environ.get("RESONA_ASR_LANGUAGE", "en")
+
 _asr: WhisperModel | None = None
 
 
@@ -23,5 +30,6 @@ def _get_asr() -> WhisperModel:
 def transcribe(audio: np.ndarray, sr: int) -> str:
     model = _get_asr()
     audio = to_mono_16k(audio, sr)
-    segments, _info = model.transcribe(audio, vad_filter=True)
+    language = None if _ASR_LANGUAGE == "auto" else _ASR_LANGUAGE
+    segments, _info = model.transcribe(audio, language=language, vad_filter=True)
     return " ".join(segment.text.strip() for segment in segments).strip()
